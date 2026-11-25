@@ -1,2 +1,15 @@
 :root{font-family:system-ui,sans-serif;color:#16211b;background:#f6f7f4}body{margin:0}main{max-width:920px;margin:40px auto;padding:0 20px}header,.section-head{display:flex;justify-content:space-between;gap:16px;align-items:center}.eyebrow{font-size:.85rem;font-weight:700;color:#276749;margin:0}h1{margin:.15rem 0 1.5rem}.card{background:#fff;border:1px solid #dce3dc;border-radius:10px;padding:24px;margin:20px 0}form{display:grid;gap:13px;max-width:650px}label{display:grid;gap:5px;font-weight:600}small{font-weight:400}input{font:inherit;padding:9px;border:1px solid #aeb9b0;border-radius:5px}button,.signin,.file-button{font:inherit;padding:9px 13px;background:#276749;color:#fff;border:0;border-radius:5px;cursor:pointer;text-decoration:none}.file-button{display:inline-block;margin-left:8px}.check{display:flex;align-items:center;gap:8px}#results{display:grid;gap:14px;margin-top:18px}.edit-form{border-top:1px solid #dce3dc;padding-top:15px}.link-meta{color:#536158;font-size:.9rem}.error{color:#a12622}@media(max-width:600px){header,.section-head{align-items:flex-start;flex-direction:column}}
 .account{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.account [hidden]{display:none}
+
+#search { width: min(100%, 36rem); box-sizing: border-box; margin-top: 6px; }
+#results { list-style: none; padding: 0; gap: 0; }
+#results li { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid #dce3dc; }
+#results li div { min-width: 0; overflow-wrap: anywhere; }
+#results p { margin: 4px 0 0; }
+#edit-dialog { width: min(32rem, calc(100% - 2rem)); max-height: calc(100% - 2rem); box-sizing: border-box; border: 1px solid #dce3dc; border-radius: 10px; padding: 24px; color: inherit; }
+#edit-dialog::backdrop { background: #16211b80; }
+#edit-dialog h2, #edit-dialog p { margin: 0; overflow-wrap: anywhere; }
+#edit-error { color: #a12622; }
+.edit-actions { display: flex; justify-content: flex-end; gap: 8px; }
+#edit-cancel { background: #536158; }
+#edit-dialog button:disabled { opacity: .6; cursor: wait; }
