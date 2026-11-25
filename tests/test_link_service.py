@@ -17,3 +17,9 @@ def test_only_http_destinations_are_accepted():
 def test_csv_boolean_values_do_not_turn_false_into_true():
     assert as_bool("false") is False
     assert as_bool("true") is True
+
+
+def test_reserved_management_and_runtime_paths():
+    for code in ("manage", "manage/example", "admin", "runtime"):
+        with pytest.raises(ValueError): validate_code(code)
+    assert validate_code("q/pharma") == "q/pharma"
