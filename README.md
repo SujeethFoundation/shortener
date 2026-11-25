@@ -8,7 +8,7 @@ This is a Python Azure Functions app for `go.sujeeth.org`. It serves public redi
 |---|---|---|
 | `GET /{code}` | HTTP 302 public redirect | Public |
 | `POST /api/shorten` | Power Automate creation | Function key |
-| `/admin` | Management interface | Sign-in link; management calls require Entra admin |
+| `/manage` | Management interface | Sign-in link; management calls require Entra admin |
 | `GET/POST /api/links`, `PATCH /api/links/{code}` | Search, create, view, edit | Entra admin |
 | `POST /api/links/import`, `GET /api/links/export` | CSV migration | Entra admin |
 
@@ -19,7 +19,7 @@ The short code is `RowKey`. Update code never accepts an alias or RowKey, and an
 1. Install Python 3.11+ and Azure Functions Core Tools.
 2. Create a virtual environment and install `pip install -r requirements.txt`.
 3. Copy `local.settings.example.json` to `local.settings.json`. Set a development storage connection and a local base URL.
-4. Run `func start` and open `http://localhost:7071/admin`.
+4. Run `func start` and open `http://localhost:7071/manage`.
 5. Run `pytest` from this folder.
 
 For local administration testing, Easy Auth headers do not exist. Deploy to an Entra-configured Function App before testing the management API.
@@ -49,6 +49,6 @@ Send it as JSON with `x-functions-key`. `alias` is optional. A `201` response re
 
 Use [migration/MIGRATION-REPORT.md](migration/MIGRATION-REPORT.md) and the CSV template. The importer preserves aliases and maps `historicalClickCount` separately from `clickCount`, which begins at zero in Azure. It reports conflicting aliases and invalid rows without overwriting existing links.
 
-Sign in at `/admin`, choose the prepared UTF-8 CSV under **Import links**, and select **Import links**. The page lists skipped rows and their reasons. Import happens row by row; if a request is interrupted, check the list and retry the same file. Existing aliases are skipped.
+Sign in at `/manage`, choose the prepared UTF-8 CSV under **Import links**, and select **Import links**. The page lists skipped rows and their reasons. Import happens row by row; if a request is interrupted, check the list and retry the same file. Existing aliases are skipped.
 
 The current migration data is empty because the open Chrome window did not contain Rebrandly. Export Rebrandly links as CSV and import only after the row-by-row verification steps in the report.

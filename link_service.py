@@ -15,7 +15,7 @@ def utc_now() -> str:
 
 def validate_code(code: str) -> str:
     code = (code or "").strip()
-    if len(code) > 128 or not CODE_RE.fullmatch(code) or code.split('/')[0].lower() in {'api', 'admin', '.auth'}:
+    if len(code) > 128 or not CODE_RE.fullmatch(code) or code.split('/')[0].lower() in {'api', 'admin', 'runtime', 'manage', '.auth'}:
         raise ValueError("Alias must use letters, numbers, hyphens, underscores, and optional path separators.")
     return code
 

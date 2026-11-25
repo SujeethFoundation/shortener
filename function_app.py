@@ -171,7 +171,7 @@ def export_csv(req):
     return func.HttpResponse(stream.getvalue(), mimetype="text/csv", headers={"Content-Disposition": "attachment; filename=short-links.csv"})
 
 
-@app.route(route="admin/{asset?}", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+@app.route(route="manage/{asset?}", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 def admin_site(req):
     # Easy Auth is intentionally checked by API routes. This page directs visitors to Entra sign-in.
     asset = req.route_params.get("asset") or "admin.html"
@@ -184,7 +184,7 @@ def admin_site(req):
 def redirect(req):
     code = req.route_params["code"]
     # Reserve operational routes even when no Static Web Apps proxy is present.
-    if code in {"api", "admin", ".auth"}: return error("Not found.", 404)
+    if code in {"api", "admin", "runtime", "manage", ".auth"}: return error("Not found.", 404)
     entity = LinkStore().get(code)
     if not entity or not entity.get("IsActive", True): return error("Link not found.", 404)
     expiry = entity.get("ExpiresOn")
