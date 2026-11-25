@@ -188,7 +188,12 @@ def admin_site(req):
 
 @app.route(route="{*code}", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 def redirect(req):
-    code = req.route_params["code"]
+    code = req.route_params.get("code")
+    if not code:
+        return func.HttpResponse(
+            status_code=302,
+            headers={"Location": "https://www.sujeeth.org/", "Cache-Control": "no-store"},
+        )
     # Reserve operational routes even when no Static Web Apps proxy is present.
     if code in {"api", "admin", "runtime", "manage", ".auth"}: return error("Not found.", 404)
     entity = LinkStore().get(code)
