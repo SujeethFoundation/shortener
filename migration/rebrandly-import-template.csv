@@ -1,0 +1,2 @@
+code,destinationUrl,description,isActive,createdOn,expiresOn,historicalClickCount,sourceDomain,tags,source
+example,https://example.org,Example only,true,2026-01-01T00:00:00Z,,0,go.sujeeth.org,,rebrandly
