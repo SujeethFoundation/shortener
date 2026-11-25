@@ -2,6 +2,10 @@
 
 This is a Python Azure Functions app for `go.sujeeth.org`. It serves public redirects, a small Entra-backed administration site, Power Automate creation, and CSV import/export. Nothing in this folder deploys or changes Azure, DNS, GitHub, or Rebrandly by itself.
 
+## Directory access
+
+Set `ALLOWED_TENANT_ID` to your Microsoft Entra directory tenant ID before deployment. App Service Authentication must be enabled and its Microsoft identity provider configured; this app relies on its validated identity headers. Management access is available to signed-in users in that tenant, including guest users in the directory. Entra assignment and App Service authorization rules can further restrict access. A missing tenant setting denies management access. Power Automate continues to use its function-key endpoint.
+
 ## What is protected
 
 | Route | Purpose | Access |

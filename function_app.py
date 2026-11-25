@@ -12,6 +12,7 @@ from azure.core.exceptions import ResourceModifiedError
 
 from link_service import as_bool, generated_code, public_link, utc_now, validate_code, validate_url
 from storage import LinkStore, PARTITION
+from identity_policy import tenant_user
 
 app = func.FunctionApp()
 STATIC = Path(__file__).parent / "static"
@@ -52,15 +53,16 @@ def admin_identity(req):
 
 
 def require_admin(req):
-    identity = admin_identity(req)
-    return identity or ""
+    if req.headers.get("Authorization"):
+        return ""
+    return tenant_user(req.headers.get("X-MS-CLIENT-PRINCIPAL"), os.getenv("ALLOWED_TENANT_ID", "")) or ""
 
 
 @app.route(route="api/session", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 def session(req):
     identity = require_admin(req)
     if not identity:
-        return error("Administrator sign-in is required.", 401)
+        return error("A permitted directory user must sign in.", 401)
     name = req.headers.get("X-MS-CLIENT-PRINCIPAL-NAME") or identity
     return func.HttpResponse(json.dumps({"name": name}), mimetype="application/json", headers={"Cache-Control": "no-store"})
 
@@ -107,7 +109,7 @@ def shorten(req: func.HttpRequest):
 @app.route(route="api/links", methods=["GET", "POST"], auth_level=func.AuthLevel.ANONYMOUS)
 def list_links(req):
     actor = require_admin(req)
-    if not actor: return error("Administrator sign-in is required.", 401)
+    if not actor: return error("A permitted directory user must sign in.", 401)
     store = LinkStore()
     if req.method == "POST":
         try:
@@ -128,7 +130,7 @@ def list_links(req):
 @app.route(route="api/links/item/{*code}", methods=["GET", "PATCH"], auth_level=func.AuthLevel.ANONYMOUS)
 def link_by_code(req):
     actor = require_admin(req)
-    if not actor: return error("Administrator sign-in is required.", 401)
+    if not actor: return error("A permitted directory user must sign in.", 401)
     code = validate_code(req.route_params["code"])
     store = LinkStore(); entity = store.get(code)
     if not entity: return error("Link not found.", 404)
@@ -150,7 +152,7 @@ def link_by_code(req):
 @app.route(route="api/links/import", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
 def import_csv(req):
     actor = require_admin(req)
-    if not actor: return error("Administrator sign-in is required.", 401)
+    if not actor: return error("A permitted directory user must sign in.", 401)
     try:
         reader = csv.DictReader(io.StringIO(req.get_body().decode("utf-8-sig")))
         required = {"code", "destinationUrl"}
@@ -171,7 +173,7 @@ def import_csv(req):
 
 @app.route(route="api/links/export", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 def export_csv(req):
-    if not require_admin(req): return error("Administrator sign-in is required.", 401)
+    if not require_admin(req): return error("A permitted directory user must sign in.", 401)
     fields = ["code", "destinationUrl", "description", "isActive", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "expiresOn", "clickCount", "historicalClickCount", "lastClickedOn", "source", "sourceDomain", "tags"]
     stream = io.StringIO(); writer = csv.DictWriter(stream, fieldnames=fields); writer.writeheader()
     for entity in LinkStore().list(limit=10000):

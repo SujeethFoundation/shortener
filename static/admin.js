@@ -6,7 +6,7 @@ async function showSession() {
   try {
     const response = await fetch('/api/session', {cache: 'no-store'});
     if (response.status === 401 || response.status === 403) {
-      status.textContent = 'Administrator sign-in required.';
+      status.textContent = 'Sign in with your Sujeeth Foundation account.';
       signIn.hidden = false;
       return;
     }
@@ -21,7 +21,7 @@ async function showSession() {
 }
 const request = async (url, options = {}) => {
   const response = await fetch(url, options);
-  if (response.status === 401) throw new Error('Sign in with Microsoft, then ensure your account is an allowed administrator.');
+  if (response.status === 401) throw new Error('Sign in with your Sujeeth Foundation account.');
   if (!response.ok) { const data = await response.json().catch(() => ({})); throw new Error(data.error || `Request failed (${response.status})`); }
   return response;
 };
