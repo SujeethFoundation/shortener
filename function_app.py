@@ -56,6 +56,15 @@ def require_admin(req):
     return identity or ""
 
 
+@app.route(route="api/session", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+def session(req):
+    identity = require_admin(req)
+    if not identity:
+        return error("Administrator sign-in is required.", 401)
+    name = req.headers.get("X-MS-CLIENT-PRINCIPAL-NAME") or identity
+    return func.HttpResponse(json.dumps({"name": name}), mimetype="application/json", headers={"Cache-Control": "no-store"})
+
+
 def new_entity(code, payload, actor, source="native"):
     now = utc_now()
     return {
