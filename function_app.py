@@ -119,7 +119,7 @@ def list_links(req):
                 else: return error("Could not allocate a unique code; retry the request.", 503)
             return json_response(public_link(store.get(code), os.environ["SHORTLINK_BASE_URL"]), 201)
         except ValueError as exc: return error(str(exc))
-    return json_response({"items": [public_link(x, os.environ["SHORTLINK_BASE_URL"]) for x in store.list(req.params.get("search", ""))]})
+    return json_response({"items": [public_link(x, os.environ["SHORTLINK_BASE_URL"]) for x in store.list(req.params.get("search", ""), sort=req.params.get("sort", ""))]})
 
 
 @app.route(route="api/links/item/{*code}", methods=["GET", "PATCH"], auth_level=func.AuthLevel.ANONYMOUS)

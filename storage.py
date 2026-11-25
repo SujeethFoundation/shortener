@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import os
+from heapq import nsmallest
+from itertools import islice
 from typing import Iterable
 from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError, ResourceModifiedError
 from azure.data.tables import TableServiceClient, UpdateMode
@@ -50,18 +52,29 @@ class LinkStore:
         etag = item.pop('_etag')
         self.table.update_entity(item, mode=UpdateMode.REPLACE, etag=etag, match_condition=MatchConditions.IfNotModified)
 
-    def list(self, search: str = "", limit: int = 250) -> Iterable[dict]:
-        # Azure Table Storage has no contains query; bounded scan keeps this simple and predictable.
+    def list(self, search: str = "", limit: int = 250, sort: str = "") -> Iterable[dict]:
         rows = self.table.query_entities("PartitionKey eq 'links'", results_per_page=min(limit, 1000))
         needle = search.lower().strip()
-        count = 0
-        for row in rows:
-            result = dict(row)
-            if not needle or needle in result.get("Code", "").lower() or needle in result.get("DestinationUrl", "").lower() or needle in result.get("Description", "").lower():
-                yield result
-                count += 1
-                if count >= limit:
-                    return
+
+        def matches():
+            for row in rows:
+                result = dict(row)
+                if not needle or any(
+                    needle in result.get(field, "").lower()
+                    for field in ("Code", "DestinationUrl", "Description")
+                ):
+                    yield result
+
+        field, _, direction = sort.partition("-")
+        click_field = {"new": "ClickCount", "historical": "HistoricalClickCount"}.get(field)
+        if click_field and direction in {"asc", "desc"}:
+            sign = -1 if direction == "desc" else 1
+            yield from nsmallest(
+                limit, matches(),
+                key=lambda row: (sign * int(row.get(click_field, 0)), row.get("Code", row["RowKey"])),
+            )
+        else:
+            yield from islice(matches(), limit)
 
     def increment_click(self, code: str, now: str):
         for _ in range(4):
