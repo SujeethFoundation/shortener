@@ -27,6 +27,7 @@ const request = async (url, options = {}) => {
 };
 const valueForDateInput = value => value ? value.replace('Z','').slice(0,16) : '';
 const searchInput = document.querySelector('#search');
+const sortInput = document.querySelector('#link-sort');
 const summary = document.querySelector('#search-summary');
 const results = document.querySelector('#results');
 const dialog = document.querySelector('#edit-dialog');
@@ -43,7 +44,8 @@ async function load() {
   const version = ++requestVersion;
   const search = searchInput.value.trim();
   try {
-    const data = await (await request(`/api/links?search=${encodeURIComponent(search)}`)).json();
+    const query = new URLSearchParams({search, sort: sortInput.value});
+    const data = await (await request(`/api/links?${query}`)).json();
     if (version !== requestVersion) return;
     render(data.items);
     if (notice.className === 'error') notice.textContent = '';
@@ -133,6 +135,10 @@ editForm.addEventListener('submit', async event => {
   }
 });
 document.querySelector('#create-form').addEventListener('submit',async e=>{e.preventDefault();try{const response=await request('/api/links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});const item=await response.json();notice.className='';notice.textContent=`Created ${item.shortUrl}`;e.target.reset();load()}catch(err){notice.textContent=err.message;notice.className='error'}});
+sortInput.addEventListener('change', () => {
+  clearTimeout(searchTimer);
+  load();
+});
 searchInput.addEventListener('input', () => {
   ++requestVersion;
   clearTimeout(searchTimer);
