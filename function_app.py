@@ -58,14 +58,6 @@ def require_admin(req):
     return tenant_user(req.headers.get("X-MS-CLIENT-PRINCIPAL"), os.getenv("ALLOWED_TENANT_ID", "")) or ""
 
 
-@app.route(route="api/session", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
-def session(req):
-    identity = require_admin(req)
-    if not identity:
-        return error("A permitted directory user must sign in.", 401)
-    name = req.headers.get("X-MS-CLIENT-PRINCIPAL-NAME") or identity
-    return func.HttpResponse(json.dumps({"name": name}), mimetype="application/json", headers={"Cache-Control": "no-store"})
-
 
 def new_entity(code, payload, actor, source="native"):
     now = utc_now()
@@ -110,6 +102,9 @@ def shorten(req: func.HttpRequest):
 def list_links(req):
     actor = require_admin(req)
     if not actor: return error("A permitted directory user must sign in.", 401)
+    if req.method == "GET" and req.params.get("session") == "1":
+        name = req.headers.get("X-MS-CLIENT-PRINCIPAL-NAME") or actor
+        return func.HttpResponse(json.dumps({"name": name}), mimetype="application/json", headers={"Cache-Control": "no-store"})
     store = LinkStore()
     if req.method == "POST":
         try:

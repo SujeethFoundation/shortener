@@ -4,7 +4,7 @@ async function showSession() {
   const signIn = document.querySelector('#sign-in');
   const signOut = document.querySelector('#sign-out');
   try {
-    const response = await fetch('/api/session', {cache: 'no-store'});
+    const response = await fetch('/api/links?session=1', {cache: 'no-store'});
     if (response.status === 401 || response.status === 403) {
       status.textContent = 'Sign in with your Sujeeth Foundation account.';
       signIn.hidden = false;
