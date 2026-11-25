@@ -1,0 +1,6 @@
+{
+  "openapi": "3.0.1",
+  "info": {"title": "Sujeeth URL Shortener", "version": "1.0.0", "description": "Create immutable short links from Power Automate."},
+  "servers": [{"url": "https://YOUR-FUNCTION-APP.azurewebsites.net/api"}],
+  "paths": {"/shorten": {"post": {"operationId": "CreateShortUrl", "summary": "Create short URL", "parameters": [{"name":"x-functions-key","in":"header","required":true,"schema":{"type":"string"}}], "requestBody": {"required":true,"content":{"application/json":{"schema":{"type":"object","required":["destinationUrl"],"properties":{"destinationUrl":{"type":"string","format":"uri"},"alias":{"type":"string"},"description":{"type":"string"},"expiresOn":{"type":"string","format":"date-time"}}}}}}, "responses":{"201":{"description":"Created","content":{"application/json":{"schema":{"type":"object"}}}},"409":{"description":"Alias already exists"}}}}}
+}
