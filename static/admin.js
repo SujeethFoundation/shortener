@@ -1,7 +1,27 @@
 const notice = document.querySelector('#notice');
+async function showSession() {
+  const status = document.querySelector('#account-status');
+  const signIn = document.querySelector('#sign-in');
+  const signOut = document.querySelector('#sign-out');
+  try {
+    const response = await fetch('/api/session', {cache: 'no-store'});
+    if (response.status === 401 || response.status === 403) {
+      status.textContent = 'Sign in with your Sujeeth Foundation account.';
+      signIn.hidden = false;
+      return;
+    }
+    if (!response.ok) throw new Error('Unable to check sign-in.');
+    const session = await response.json();
+    status.textContent = `Signed in as ${session.name}`;
+    signOut.hidden = false;
+  } catch (error) {
+    status.textContent = 'Unable to check sign-in. Refresh to try again.';
+    signIn.hidden = false;
+  }
+}
 const request = async (url, options = {}) => {
   const response = await fetch(url, options);
-  if (response.status === 401) throw new Error('Sign in with Microsoft, then ensure your account is an allowed administrator.');
+  if (response.status === 401) throw new Error('Sign in with your Sujeeth Foundation account.');
   if (!response.ok) { const data = await response.json().catch(() => ({})); throw new Error(data.error || `Request failed (${response.status})`); }
   return response;
 };
@@ -51,4 +71,5 @@ document.querySelector('#import-form').addEventListener('submit', async e => {
     await load();
   } finally { button.disabled = false; }
 });
+showSession();
 load();
