@@ -56,3 +56,7 @@ Use [migration/MIGRATION-REPORT.md](migration/MIGRATION-REPORT.md) and the CSV t
 Sign in at `/manage`, choose the prepared UTF-8 CSV under **Import links**, and select **Import links**. The page lists skipped rows and their reasons. Import happens row by row; if a request is interrupted, check the list and retry the same file. Existing aliases are skipped.
 
 The current migration data is empty because the open Chrome window did not contain Rebrandly. Export Rebrandly links as CSV and import only after the row-by-row verification steps in the report.
+
+## Platform architecture
+
+This repo is one of nine in the SujeethFoundation org. The architecture docs live in the website repo's `architecture/` folder: [platform architecture](https://github.com/SujeethFoundation/sujeethfoundation.github.io/blob/main/architecture/platform-architecture.md), [data model and portal](https://github.com/SujeethFoundation/sujeethfoundation.github.io/blob/main/architecture/platform-data-model-and-portal.md) and [business architecture](https://github.com/SujeethFoundation/sujeethfoundation.github.io/blob/main/architecture/business-architecture.md). This repo is the go.sujeeth.org link shortener. See "shortner" in the platform architecture doc. Each repo's README is listed in the platform architecture doc under "Repo READMEs".
